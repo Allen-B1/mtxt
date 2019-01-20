@@ -116,7 +116,21 @@ class MScore {
 	public notes: string = "";
 
 	get elements() : MElement[] {
-		return [];
+		var out: MElement[] = [];
+	
+		var notelist = this.notes.split(" ").filter(Boolean);
+		outer: for (var note of notelist) {
+			for (var Type of MElementTypes) {
+				if (Type.test(note)) {
+					out.push(new Type(note));
+					continue outer;
+				}
+			}
+
+			throw new Error("unknown object: '" + note + "'");
+		}
+		
+		return out;
 	}
 	
 	toSVG(size: number) : string {
@@ -128,17 +142,14 @@ class MScore {
 
 		var notelist = this.notes.split(" ").filter(Boolean);
 		var xpos = 0;
-		outer: for (var note of notelist) {
-			for (var Type of MElementTypes) {
-				if (Type.test(note)) {
-					var element = new Type(note);
-					svg += element.draw(xpos, size);
-					xpos++;
-					continue outer;
-				}
-			}
+		for (var element of this.elements) {
+			svg += element.draw(xpos, size);
 
-			throw new Error("unknown object: '" + note + "'");
+			if (element instanceof MNote) {
+				xpos += 2 * element.duration;				
+			} else {			
+				xpos += 2;
+			}
 		}
 		
 		return '<svg version="1.1">' + svg + "</svg>";
