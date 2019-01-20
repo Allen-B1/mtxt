@@ -16,19 +16,23 @@ interface MElementType {
 	test (input: string) : boolean;
 }
 
-
 class MNote extends MElement {
 	private type: number; // 1: Quarter, 2: Half, 3: Dotted half, 4: Whole, 8: Eighth, 16: Sixteenth	
 	private pitch: string;
 	private octave: number;
 	static test(input: string) : boolean {
-		return /^([1234]?)([ABCDEFG])([0-9]?)$/.test(input);
+		return /^([0-9]*)([ABCDEFG])([0-9]?)$/.test(input);
 	}
 
 	constructor(input: string) {
 		super();
-		var arr = /^([1234]?)([ABCDEFG])([0-9]?)$/.exec(input);
+		var arr = /^([0-9]*)([ABCDEFG])([0-9]?)$/.exec(input);
 		this.type = Number(arr[1]) || 1;
+
+		if (this.type >= 5 && this.type <= 7 || this.type >= 9) {
+			throw new Error("Note: unsupported type: " + input);
+		}
+		
 		this.pitch = arr[2];
 		this.octave = Number(arr[3]) || 4; 
 	}
@@ -50,7 +54,7 @@ class MNote extends MElement {
 		
 		// Draw notehead
 		svg += '<circle cx="' + xpos * size + '" cy="' + (ypos * size / 2) + '" r="' + (size / 4) + '" ' + 
-			(this.type == 1 ?
+			(this.type == 1 || this.type >= 8 ?
 			'fill="#000"' :
 			'stroke="#000" fill="transparent"') +
 		' />';
@@ -58,9 +62,9 @@ class MNote extends MElement {
 		// Draw stem
 		if (this.type != 4) {
 			let stemX: number, stemY: number, stemH: number;
-			var up = ypos <= 4;
+			var up = ypos <= 4; // whether note is an upper note; whether stem goes down
 			if (!up) {
-				stemX = (xpos  * size) + (size / 4);
+				stemX = (xpos * size) + (size / 4);
 				stemY = (ypos * size / 2) - (size * 3);
 			} else {
 				stemX = (xpos  * size) - (size / 4);
@@ -68,6 +72,16 @@ class MNote extends MElement {
 			}
 			stemH = size * 3;
 			svg += '<rect x="' + stemX + '" y="' + stemY + '" height="' + stemH + '" width="1" fill="#000" />'
+
+			// Draw flag thing
+			if (this.type >= 8) {
+				let lineX1: number, lineX2: number, lineY1: number, lineY2: number;
+				lineX1 = stemX;
+				lineY1 = up ? ((ypos * size / 2) + (size * 3)) : ((ypos * size / 2) - (size * 3));
+				lineX2 = lineX1 + size * (1 / Math.sqrt(2));
+				lineY2 = lineY1 + (up ? -1 : 1) * size * (1 / Math.sqrt(2));
+				svg += '<line x1="' + lineX1 + '" y1="' + lineY1 + '" x2="' + lineX2 + '" y2="' + lineY2 + '" stroke="#000" />';
+			}
 		}
 		
 		return svg;
