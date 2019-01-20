@@ -7,11 +7,24 @@
 			height: 100%;
 		}
 		body {
-			padding: 0; margin: 0;
+			padding: 0;
+			margin-top: 56px;
 			display: flex;
 			flex-direction: row;
 			align-items: stretch;
 			height: 100vh;
+		}
+		#header {
+			position: fixed;
+			top: 0; left: 0; right: 0;
+			background: #000;
+			font-size: 16px;
+			padding: 16px 32px;
+			color: #FFF;
+		}
+		#header-save, #header-export {
+			float: right;
+			margin-left: 16px;
 		}
 		#in {
 			padding: 16px;
@@ -44,6 +57,11 @@
 		</style>
 	</head>
 	<body>
+		<div id="header">
+		MTXT
+		<a id="header-save" download="file.txt">Save</a>
+		<a id="header-export" download="file.svg">Export</a>
+		</div>
 		<div id="in">
 			<input id="title" value="Twinkle Twinkle Little Star" />
 			<textarea id="notes">| C C G G | A A 2G | F F E E | D D 2C |</textarea>
@@ -55,20 +73,30 @@
 var score = new MScore();
 
 document.getElementById("notes").oninput = function() {
-	score.notes = this.value;
 	update();
 }
-document.getElementById("notes").oninput();
 
 function update() {
+	score.notes = document.getElementById("notes").value;
+	score.title = document.getElementById("title").value;
+
 	try {
-		document.getElementById("out").innerHTML = score.toSVG(20);
+		var svg = score.toSVG(20);
+		document.getElementById("out").innerHTML = svg;
 		document.getElementById("error").innerHTML = "";
+		var headerSave = document.getElementById("header-save"),
+			headerExport = document.getElementById("header-export");
+		headerSave.setAttribute("download", score.title.replace(/\s+/g, "_") + ".txt");
+		headerExport.setAttribute("download", score.title.replace(/\s+/g, "_") + ".svg");
+		headerSave.href = "data:text/plain," + encodeURI(score.notes);
+		headerExport.href = "data:text/svg," + encodeURI(svg);
 	} catch(err) {
 		document.getElementById("error").innerHTML = err;
 	}
 }
 
+
+update();
 		</script>
 	</body>
 </html>
