@@ -1,4 +1,4 @@
-enum Clef {
+enum MClef {
 	// How far away from first line of staff C4 is
 	TREBLE = +10,
 	ALTO = +4,
@@ -17,7 +17,7 @@ interface MElementType {
 }
 
 
-class Note extends MElement {
+class MNote extends MElement {
 	private type: number; // 1: Quarter, 2: Half, 3: Dotted half, 4: Whole, 8: Eighth, 16: Sixteenth	
 	private pitch: string;
 	private octave: number;
@@ -46,7 +46,7 @@ class Note extends MElement {
 		if (this.pitch == "A" || this.pitch == "B") 
 			octave++;
 
-		var ypos = Clef.TREBLE - (this.pitch.charCodeAt(0) - "A".charCodeAt(0) - 2 +  7 * (octave - 4));
+		var ypos = MClef.TREBLE - (this.pitch.charCodeAt(0) - "A".charCodeAt(0) - 2 +  7 * (octave - 4));
 		
 		// Draw notehead
 		svg += '<circle cx="' + xpos * size + '" cy="' + (ypos * size / 2) + '" r="' + (size / 4) + '" ' + 
@@ -74,7 +74,7 @@ class Note extends MElement {
 	}	
 }
 
-class Barline extends MElement {
+class MBarline extends MElement {
 	private type: string;
 
 	static test(input: string) : boolean {
@@ -96,9 +96,9 @@ class Barline extends MElement {
 	}		
 }
 
-var MElementTypes: MElementType[] = [Note, Barline];
+var MElementTypes: MElementType[] = [MNote, MBarline];
 
-class Score {
+class MScore {
 	public notes: string = "";
 
 	get elements() : MElement[] {
