@@ -30,7 +30,7 @@ class MNote extends MElement {
 		this.type = Number(arr[1]) || 1;
 
 		if (this.type >= 5 && this.type <= 7 || this.type >= 9) {
-			throw new Error("Note: unsupported type: " + input);
+			throw new Error("Note: unsupported type " + this.type + ": '" + input + "'");
 		}
 		
 		this.pitch = arr[2];
@@ -128,15 +128,17 @@ class MScore {
 
 		var notelist = this.notes.split(" ").filter(Boolean);
 		var xpos = 0;
-		for (var note of notelist) {
+		outer: for (var note of notelist) {
 			for (var Type of MElementTypes) {
 				if (Type.test(note)) {
 					var element = new Type(note);
 					svg += element.draw(xpos, size);
 					xpos++;
-					continue;
+					continue outer;
 				}
 			}
+
+			throw new Error("unknown object: '" + note + "'");
 		}
 		
 		return '<svg version="1.1">' + svg + "</svg>";
