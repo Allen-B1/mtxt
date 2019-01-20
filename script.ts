@@ -41,7 +41,7 @@ class MNote extends MElement {
 		if (this.type <= 4) 
 			return this.type;
 		else 
-			return 1 / this.type;
+			return 4 / this.type;
 	}
 
 	draw(xpos: number, size: number) : string {
