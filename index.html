@@ -6,12 +6,46 @@
 			width: 100%;
 			height: 100%;
 		}
+		body {
+			padding: 0; margin: 0;
+			display: flex;
+			flex-direction: row;
+			align-items: stretch;
+			height: 100vh;
+		}
+		#in {
+			padding: 16px;
+			flex-grow: 1;
+			background: #fff;
+		}
+		#in textarea {
+			resize: vertical;
+		}
+		#in input, #in textarea {
+			width: -webkit-fill-available;		
+			width: -moz-fill-available;
+			width: fill-available;
+			border: 0;
+			background: #000;
+			color: #fff;
+			margin-bottom: 8px;
+			outline: 0;
+			padding: 16px;
+			font-family: monospace;
+		}
+		#out {
+			flex-grow: 1;
+			padding: 16px 32px;
+		}
 		</style>
 	</head>
 	<body>
-		<textarea id="notes"></textarea>
+		<div id="in">
+			<input id="title" value="Twinkle Twinkle Little Star" />
+			<textarea id="notes">| C C G G | A A 2G | F F E E | D D 2C |</textarea>
+		</div>
+		<div id="out"></div>
 		<script src="script.js"></script>
-		<div id="score"></div>
 		<script>
 var score = new Score();
 
@@ -19,9 +53,10 @@ document.getElementById("notes").oninput = function() {
 	score.notes = this.value;
 	update();
 }
+document.getElementById("notes").oninput();
 
 function update() {
-	document.getElementById("score").innerHTML = score.toSVG(20);
+	document.getElementById("out").innerHTML = score.toSVG(20);
 }
 
 		</script>
