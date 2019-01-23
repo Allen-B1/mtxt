@@ -1,0 +1,18 @@
+Piano Sonata No. 3
+Beethoven
+
+# One empty line denotes end of header
+Part "Piano" 1 {
+  Clef{Treble} |
+  2C4E4 (16[B3D4 C4E4 B3D4 C4E4]) 8[D4F4 C4E4] |
+# . Stacato
+# ^ Marcato
+# > Accent
+# _ Tenuto
+# .. Stacatissimo
+  4B3D4.. 4B3G4..
+}
+
+Part "Piano" 1 {
+  Clef{Bass} | 1[C3 G3] | 4G2G3.. 4G2G3..
+}
