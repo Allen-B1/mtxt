@@ -69,34 +69,6 @@
 		</div>
 		<div id="out"></div>
 		<script src="script.js"></script>
-		<script>
-var score = new MScore();
-
-document.getElementById("notes").oninput = function() {
-	update();
-}
-
-function update() {
-	score.notes = document.getElementById("notes").value;
-	score.title = document.getElementById("title").value;
-
-	try {
-		var svg = score.toSVG(20);
-		document.getElementById("out").innerHTML = svg;
-		document.getElementById("error").innerHTML = "";
-		var headerSave = document.getElementById("header-save"),
-			headerExport = document.getElementById("header-export");
-		headerSave.setAttribute("download", score.title.replace(/\s+/g, "_") + ".txt");
-		headerExport.setAttribute("download", score.title.replace(/\s+/g, "_") + ".svg");
-		headerSave.href = "data:text/plain," + encodeURI(score.notes);
-		headerExport.href = "data:image/svg+xml," + encodeURI(svg);
-	} catch(err) {
-		document.getElementById("error").innerHTML = err;
-	}
-}
-
-
-update();
-		</script>
+		<script src="midi.js"></script>
 	</body>
 </html>

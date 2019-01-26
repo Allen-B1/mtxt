@@ -1,157 +1,124 @@
-enum MClef {
-	// How far away from first line of staff C4 is
-	TREBLE = +10,
-	ALTO = +4,
-	BASS = -2
-}
-
-abstract class MElement {
-	draw(xpos: number, size: number) : string {
-		return "";
-	}
-}
-
-interface MElementType {
-	new (input: string) : MElement;
-	test (input: string) : boolean;
-}
-
-class MNote extends MElement {
-	private type: number; // 1: Quarter, 2: Half, 3: Dotted half, 4: Whole, 8: Eighth, 16: Sixteenth	
-	private pitch: string;
-	private octave: number;
-	static test(input: string) : boolean {
-		return /^([0-9]*)([ABCDEFG])([0-9]?)$/.test(input);
-	}
-
-	constructor(input: string) {
-		super();
-		var arr = /^([0-9]*)([ABCDEFG])([0-9]?)$/.exec(input);
-		this.type = Number(arr[1]) || 1;
-
-		if (this.type >= 5 && this.type <= 7 || this.type >= 9) {
-			throw new Error("Note: unsupported type " + this.type + ": '" + input + "'");
-		}
-		
-		this.pitch = arr[2];
-		this.octave = Number(arr[3]) || 4; 
-	}
-
-	get duration() : number {
-		if (this.type <= 4) 
-			return this.type;
-		else 
-			return 4 / this.type;
-	}
-
-	draw(xpos: number, size: number) : string {
-		var svg: string = "";
-		var octave = this.octave
-		if (this.pitch == "A" || this.pitch == "B") 
-			octave++;
-
-		var ypos = MClef.TREBLE - (this.pitch.charCodeAt(0) - "A".charCodeAt(0) - 2 +  7 * (octave - 4));
-		
-		// Draw notehead
-		svg += '<circle cx="' + xpos * size + '" cy="' + (ypos * size / 2) + '" r="' + (size / 4) + '" ' + 
-			(this.type == 1 || this.type >= 8 ?
-			'fill="#000"' :
-			'stroke="#000" fill="transparent"') +
-		' />';
-
-		// Draw stem
-		if (this.type != 4) {
-			let stemX: number, stemY: number, stemH: number;
-			var up = ypos <= 4; // whether note is an upper note; whether stem goes down
-			if (!up) {
-				stemX = (xpos * size) + (size / 4);
-				stemY = (ypos * size / 2) - (size * 3);
-			} else {
-				stemX = (xpos  * size) - (size / 4);
-				stemY = (ypos * size / 2);						
+namespace M {
+	// parses a string into a series of tokens
+	function parseTokens(input: string): string[] {
+		var out: string[] = [];
+		var current = "";
+		var brack: string[] = [];
+		for (let i = 0; i < input.length; i++) {
+			if (input[i] == " " && brack.length == 0) {
+				out.push(current);
+				current = "";
+				continue;
 			}
-			stemH = size * 3;
-			svg += '<rect x="' + stemX + '" y="' + stemY + '" height="' + stemH + '" width="1" fill="#000" />'
 
-			// Draw flag thing
-			if (this.type >= 8) {
-				let lineX1: number, lineX2: number, lineY1: number, lineY2: number;
-				lineX1 = stemX;
-				lineY1 = up ? ((ypos * size / 2) + (size * 3)) : ((ypos * size / 2) - (size * 3));
-				lineX2 = lineX1 + size * (1 / Math.sqrt(2));
-				lineY2 = lineY1 + (up ? -1 : 1) * size * (1 / Math.sqrt(2));
-				svg += '<line x1="' + lineX1 + '" y1="' + lineY1 + '" x2="' + lineX2 + '" y2="' + lineY2 + '" stroke="#000" />';
-			}
-		}
-		
-		return svg;
-	}	
-}
-
-class MBarline extends MElement {
-	private type: string;
-
-	static test(input: string) : boolean {
-		return input == "|" || input == "||";
-	}
-
-	constructor(input: string) {
-		super();
-		this.type = input;
-	}
-
-	draw(xpos: number, size: number) : string {
-		var svg = "";
-		svg += '<rect x="' + (xpos * size) + '" y="0" width="1" height="' + (size * 4) + '" fill="#000" />';
-		if (this.type == "||") {
-			svg += '<rect x="' + (xpos * size + 5) + '" y="0" width="1" height="' + (size * 4) + '" fill="#000" />';				
-		}
-		return svg;
-	}		
-}
-
-var MElementTypes: MElementType[] = [MNote, MBarline];
-
-class MScore {
-	public notes: string = "";
-
-	get elements() : MElement[] {
-		var out: MElement[] = [];
-	
-		var notelist = this.notes.split(" ").filter(Boolean);
-		outer: for (var note of notelist) {
-			for (var Type of MElementTypes) {
-				if (Type.test(note)) {
-					out.push(new Type(note));
-					continue outer;
+			if (input[i] == "]" || input[i] == ")") {
+				brack.pop();
+				current += input[i];
+				if (brack.length == 0) {
+					out.push(current);
+					current = "";
 				}
+				continue;
 			}
 
-			throw new Error("unknown object: '" + note + "'");
+			if (input[i] == "[" || input[i] == "(") {
+				brack.push(input[i]);
+			}
+
+			current += input[i];
 		}
-		
+		out.push(current);
 		return out;
 	}
-	
-	toSVG(size: number) : string {
-		var svg = "";
 
-		for (var i = 0; i < 5; i++) {
-			svg += '<rect x="0" y="' + (i * size) + '" width="100%" height="1" fill="#000" />';
-		}
-
-		var notelist = this.notes.split(" ").filter(Boolean);
-		var xpos = 0;
-		for (var element of this.elements) {
-			svg += element.draw(xpos, size);
-
-			if (element instanceof MNote) {
-				xpos += 2 * element.duration;				
-			} else {			
-				xpos += 2;
+	export class Note {
+		duration: number; // 1: whole, 2: half, 4: quarter, 8: eighth, etc.
+		pitch: string;
+		octave: number;
+		accidental: string;
+		constructor(input: string) {
+			var res = /^([0-9]*)([A-GR])([#bx])?([0-9]?)$/.exec(input);
+			if (res !== null) {
+				this.duration = Number(res[1]) || 4;
+				this.pitch = res[2];
+				this.accidental = res[3] || "";
+				this.octave = Number(res[4]) || 4;
+			} else {
+				throw new Error("Note invalid: '" + input + "'");
 			}
 		}
+
+		get hertz() : number {
+			var intervals = [
+				1,
+				16/15,
+				9/8,
+				6/5,
+				5/4,
+				4/3,
+				25/18,
+				3/2,
+				8/5,
+				5/3,
+				16/9,
+				15/8,
+			];
+			
+			var octave = this.octave;
+			if (this.pitch == "A" || this.pitch == "B") {
+				octave += 1;
+			}
 		
-		return '<svg version="1.1" xmlns="http://www.w3.org/2000/svg">' + svg + "</svg>";
+			var pitch: number = ({
+				"A": 0,
+				"B": 2,
+				"C": 3,
+				"D": 5,
+				"E": 7,
+				"F": 8,
+				"G": 10
+			}[this.pitch]) + ({
+				"b": -1,
+				"n": 0,
+				"": 0,
+				"#": +1,
+				"x": +2
+			}[this.accidental]);
+		
+			var hertz = 440 * intervals[pitch] * ((1 << octave) / 32);
+			return hertz;
+		}
+	}
+
+	export class Chord {
+		notes: Note[] = [];
+		constructor(input: string) {
+			input.split("-").forEach(function (item) {
+				this.notes.push(new Note(item));
+			})
+		}
+	}
+
+	export class Beamed {
+		notes: object[];
+		constructor(input: string) {
+			this.notes = parseString(input.slice(1, -1));
+		}
+	}
+
+	export function parseString(input: string): object[] {
+		var out: object[] = [];
+
+		var tokens = parseTokens(input);
+		for (var token of tokens) {
+			if (token[0] == "[") {
+				out.push(new Beamed(token));
+			} else if (token.indexOf("-") !== -1) {
+				out.push(new Chord(token));
+			} else {
+				out.push(new Note(token));
+			}
+		}
+		return out;
 	}
 }
