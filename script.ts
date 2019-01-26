@@ -106,6 +106,12 @@ namespace M {
 		}
 	}
 
+	export class Barline {
+		constructor(input: string) {
+			
+		}
+	}
+
 	export function parseString(input: string): object[] {
 		var out: object[] = [];
 
@@ -113,6 +119,8 @@ namespace M {
 		for (var token of tokens) {
 			if (token[0] == "[") {
 				out.push(new Beamed(token));
+			} else if(token[0] == "|") {
+				out.push(new Barline(token[0]));
 			} else if (token.indexOf("-") !== -1) {
 				out.push(new Chord(token));
 			} else {
