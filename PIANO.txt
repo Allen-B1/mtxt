@@ -1,0 +1,22 @@
+Piano Sonata No. 3
+Beethoven
+
+# One empty line denotes end of header
+Part "Piano" 1 {
+  Clef{Treble} Time{C} Dyn{p}
+# (...) slur
+# [...] beamed notes; no effect on non-beamed notes
+# R rest - in place of pitch
+  2C4E4 (16[B3D4 C4E4 B3D4 C4E4]) 8[D4F4 C4E4] |
+# . Stacato
+# ^ Marcato
+# > Accent
+# _ Tenuto
+# .. Stacatissimo
+  4B3D4.. 4B3G4..
+}
+
+Part "Piano" 1 {
+  Clef{Bass} Time{C}
+  1[C3 G3] | 4G2G3.. 4G2G3..
+}
