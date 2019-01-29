@@ -30,13 +30,14 @@ var M;
     }
     var Note = /** @class */ (function () {
         function Note(input) {
-            var res = /^([0-9]*)([A-GR])([#bx])?([0-9]?)(\.|\^|_|\.\.|\>)?$/.exec(input);
+            var res = /^([0-9]*)(\.)?([A-GR])([#bx])?([0-9]?)(\.|\^|_|\.\.|\>)?$/.exec(input);
             if (res !== null) {
-                this.duration = Number(res[1]) || 4;
-                this.pitch = res[2];
-                this.accidental = res[3] || "";
-                this.octave = Number(res[4]) || 4;
-                this.articulation = res[5] || "";
+                this.type = Number(res[1]) || 4;
+                this.dotted = (res[2] || "").length;
+                this.pitch = res[3];
+                this.accidental = res[4] || "";
+                this.octave = Number(res[5]) || 4;
+                this.articulation = res[6] || "";
             }
             else {
                 throw new Error("Note invalid: '" + input + "'");
@@ -85,6 +86,17 @@ var M;
             enumerable: true,
             configurable: true
         });
+        Object.defineProperty(Note.prototype, "duration", {
+            get: function () {
+                var duration = (1 / this.type) * 4;
+                if (this.dotted) {
+                    duration *= 1.5;
+                }
+                return duration;
+            },
+            enumerable: true,
+            configurable: true
+        });
         return Note;
     }());
     M.Note = Note;
@@ -126,7 +138,11 @@ var M;
                 out.push(new Chord(token));
             }
             else {
-                out.push(new Note(token));
+                try {
+                    out.push(new Note(token));
+                }
+                catch (err) {
+                }
             }
         }
         return out;

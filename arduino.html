@@ -63,7 +63,7 @@
 		MTXT
 		</div>
 		<div id="in">
-			<textarea id="notes">| C C G G | A A 2G | F F E E | D D 2C |</textarea>
+			<textarea id="notes"></textarea>
 		</div>
 		<div id="out"></div>
 		<script src="script.js"></script>
@@ -76,7 +76,7 @@ document.getElementById("notes").oninput = function() {
 			note = note.notes[0];
 		}
 		if (note instanceof M.Note) {
-			out += "{" + Math.round(note.hertz) + "," + (1 / note.duration * 4) + "},"			
+			out += "{" + Math.round(note.hertz) + "," + note.duration + "},"			
 		}
 	});
 	out += "}";
