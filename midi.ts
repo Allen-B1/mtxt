@@ -7,6 +7,7 @@ namespace MPlay {
 		return new Promise<any>(function(resolve) {
 			var osc = Context.createOscillator();
 			osc.frequency.value = note.hertz;
+			osc.type = "triangle";
 			osc.connect(Context.destination);
 			osc.start(0);
 	
