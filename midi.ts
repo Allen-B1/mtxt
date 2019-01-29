@@ -5,14 +5,20 @@ namespace MPlay {
 
 	export function PlayNote(note: M.Note, bpm: number) : Promise<any> {
 		return new Promise<any>(function(resolve) {
-			var osc = Context.createOscillator();
-			osc.frequency.value = note.hertz;
-			osc.type = "triangle";
-			osc.connect(Context.destination);
-			osc.start(0);
-	
+			if (note.hertz != 0) {
+				var osc = Context.createOscillator();
+				var gain = Context.createGain();
+				osc.frequency.value = note.hertz;
+				osc.type = "sine";
+				osc.connect(gain);
+				gain.connect(Context.destination);
+				osc.start(0);
+			}
+		
 			setTimeout(function() {
-				osc.stop();
+				if (note.hertz != 0) {
+					gain.gain.exponentialRampToValueAtTime(0.00001, Context.currentTime + 0.04)
+				}
 				resolve(note);
 			}, note.duration * (1 / bpm * 60) * 1000);
 		});
