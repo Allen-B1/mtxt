@@ -51,6 +51,9 @@ namespace M {
 		}
 
 		get hertz() : number {
+			if (this.pitch == "R") 
+				return 0;
+		
 			var intervals = [
 				1,
 				16/15,
@@ -104,7 +107,7 @@ namespace M {
 	export class Beamed {
 		notes: object[];
 		constructor(input: string) {
-			this.notes = parseString(input.slice(1, -1));
+			this.notes = parseRun(input.slice(1, -1));
 		}
 	}
 
@@ -114,7 +117,7 @@ namespace M {
 		}
 	}
 
-	export function parseString(input: string): object[] {
+	export function parseRun(input: string): object[] {
 		var out: object[] = [];
 
 		var tokens = parseTokens(input);
