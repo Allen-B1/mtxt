@@ -36,13 +36,15 @@ namespace M {
 		pitch: string;
 		octave: number;
 		accidental: string;
+		articulation: string;
 		constructor(input: string) {
-			var res = /^([0-9]*)([A-GR])([#bx])?([0-9]?)$/.exec(input);
+			var res = /^([0-9]*)([A-GR])([#bx])?([0-9]?)(\.|\^|_|\.\.|\>)?$/.exec(input);
 			if (res !== null) {
 				this.duration = Number(res[1]) || 4;
 				this.pitch = res[2];
 				this.accidental = res[3] || "";
 				this.octave = Number(res[4]) || 4;
+				this.articulation = res[5] || "";
 			} else {
 				throw new Error("Note invalid: '" + input + "'");
 			}
