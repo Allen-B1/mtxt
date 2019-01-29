@@ -71,12 +71,22 @@
 document.getElementById("notes").oninput = function() {
 	var notes = M.parseRun(this.value);
 	var out = "{";
+
+	function noteToString(note) {
+		return "{" + Math.round(note.hertz) + "," + note.duration + "},";
+	}
+	
 	notes.forEach(function(note) {
+		if (note instanceof M.Beamed) {
+			for (var i = 0; i < note.notes.length; i++) {
+				out += noteToString(note.notes[i]);
+			}
+		}
 		if (note instanceof M.Chord) {
 			note = note.notes[0];
 		}
 		if (note instanceof M.Note) {
-			out += "{" + Math.round(note.hertz) + "," + note.duration + "},"			
+			out += noteToString(note);
 		}
 	});
 	out += "}";

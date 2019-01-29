@@ -5,7 +5,7 @@ var M;
         var out = [];
         var current = "";
         var brack = [];
-        for (var i = 0; i < input.length; i++) {
+        for (let i = 0; i < input.length; i++) {
             if (input[i] == " " && brack.length == 0) {
                 out.push(current);
                 current = "";
@@ -28,8 +28,8 @@ var M;
         out.push(current);
         return out;
     }
-    var Note = /** @class */ (function () {
-        function Note(input) {
+    class Note {
+        constructor(input) {
             var res = /^([0-9]*)(\.)?([A-GR])([#bx])?([0-9]?)(\.|\^|_|\.\.|\>)?$/.exec(input);
             if (res !== null) {
                 this.type = Number(res[1]) || 4;
@@ -43,94 +43,81 @@ var M;
                 throw new Error("Note invalid: '" + input + "'");
             }
         }
-        Object.defineProperty(Note.prototype, "hertz", {
-            get: function () {
-                if (this.pitch == "R")
-                    return 0;
-                var intervals = [
-                    1,
-                    16 / 15,
-                    9 / 8,
-                    6 / 5,
-                    5 / 4,
-                    4 / 3,
-                    25 / 18,
-                    3 / 2,
-                    8 / 5,
-                    5 / 3,
-                    16 / 9,
-                    15 / 8,
-                ];
-                var octave = this.octave;
-                if (this.pitch == "A" || this.pitch == "B") {
-                    octave += 1;
-                }
-                var pitch = ({
-                    "A": 0,
-                    "B": 2,
-                    "C": 3,
-                    "D": 5,
-                    "E": 7,
-                    "F": 8,
-                    "G": 10
-                }[this.pitch]) + ({
-                    "b": -1,
-                    "n": 0,
-                    "": 0,
-                    "#": +1,
-                    "x": +2
-                }[this.accidental]);
-                var hertz = 440 * intervals[pitch] * ((1 << octave) / 32);
-                return hertz;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Object.defineProperty(Note.prototype, "duration", {
-            get: function () {
-                var duration = (1 / this.type) * 4;
-                if (this.dotted == 1) {
-                    duration *= 1.5;
-                }
-                else if (this.dotted == 2) {
-                    duration *= 1.75;
-                }
-                return duration;
-            },
-            enumerable: true,
-            configurable: true
-        });
-        return Note;
-    }());
+        get hertz() {
+            if (this.pitch == "R")
+                return 0;
+            var intervals = [
+                1,
+                16 / 15,
+                9 / 8,
+                6 / 5,
+                5 / 4,
+                4 / 3,
+                25 / 18,
+                3 / 2,
+                8 / 5,
+                5 / 3,
+                16 / 9,
+                15 / 8,
+            ];
+            var octave = this.octave;
+            if (this.pitch == "A" || this.pitch == "B") {
+                octave += 1;
+            }
+            var pitch = ({
+                "A": 0,
+                "B": 2,
+                "C": 3,
+                "D": 5,
+                "E": 7,
+                "F": 8,
+                "G": 10
+            }[this.pitch]) + ({
+                "b": -1,
+                "n": 0,
+                "": 0,
+                "#": +1,
+                "x": +2
+            }[this.accidental]);
+            var hertz = 440 * intervals[pitch] * ((1 << octave) / 32);
+            return hertz;
+        }
+        get duration() {
+            var duration = (1 / this.type) * 4;
+            if (this.dotted == 1) {
+                duration *= 1.5;
+            }
+            else if (this.dotted == 2) {
+                duration *= 1.75;
+            }
+            return duration;
+        }
+    }
     M.Note = Note;
-    var Chord = /** @class */ (function () {
-        function Chord(input) {
+    class Chord {
+        constructor(input) {
             this.notes = [];
-            input.split("-").forEach(function (item) {
+            input.split("-").forEach((item) => {
                 this.notes.push(new Note(item));
             });
         }
-        return Chord;
-    }());
+    }
     M.Chord = Chord;
-    var Beamed = /** @class */ (function () {
-        function Beamed(input) {
+    class Beamed {
+        constructor(input) {
             this.notes = parseRun(input.slice(1, -1));
         }
-        return Beamed;
-    }());
+    }
     M.Beamed = Beamed;
-    var Barline = /** @class */ (function () {
-        function Barline(input) {
+    class Barline {
+        constructor(input) {
         }
-        return Barline;
-    }());
+    }
     M.Barline = Barline;
     function parseRun(input) {
         var out = [];
         var tokens = parseTokens(input);
-        for (var _i = 0, tokens_1 = tokens; _i < tokens_1.length; _i++) {
-            var token = tokens_1[_i];
+        for (var token of tokens) {
             if (token[0] == "[") {
                 out.push(new Beamed(token));
             }

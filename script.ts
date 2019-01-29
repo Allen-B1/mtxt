@@ -110,7 +110,7 @@ namespace M {
 	export class Chord {
 		notes: Note[] = [];
 		constructor(input: string) {
-			input.split("-").forEach(function (item) {
+			input.split("-").forEach((item) => {
 				this.notes.push(new Note(item));
 			})
 		}
