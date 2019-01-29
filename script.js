@@ -89,8 +89,11 @@ var M;
         Object.defineProperty(Note.prototype, "duration", {
             get: function () {
                 var duration = (1 / this.type) * 4;
-                if (this.dotted) {
+                if (this.dotted == 1) {
                     duration *= 1.5;
+                }
+                else if (this.dotted == 2) {
+                    duration *= 1.75;
                 }
                 return duration;
             },
