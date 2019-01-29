@@ -129,7 +129,11 @@ namespace M {
 			} else if (token.indexOf("-") !== -1) {
 				out.push(new Chord(token));
 			} else {
-				out.push(new Note(token));
+				try {
+					out.push(new Note(token));
+				} catch(err) {
+					
+				}
 			}
 		}
 		return out;
