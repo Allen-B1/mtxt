@@ -69,5 +69,11 @@
 		<div id="out"></div>
 		<script src="script.js"></script>
 		<script src="midi.js"></script>
+		<script src="svg.js"></script>
+		<script>
+document.getElementById("notes").oninput = function() {
+	document.getElementById("out").innerHTML = MSvg.convert(M.parseRun(this.value), 15);
+}
+		</script>
 	</body>
 </html>
