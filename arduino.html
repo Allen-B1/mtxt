@@ -74,7 +74,12 @@ document.getElementById("notes").oninput = function() {
 	var out = "{";
 
 	function noteToString(note) {
-		return "{" + Math.round(note.hertz) + "," + note.duration + "},";
+		if (note.hertz != 0 && (note.articulation == "." || note.articulation == ".." || note.articulation == "^")) {
+			return "{" + Math.round(note.hertz) + "," + (note.duration / 2) + "}," +
+				"{0," + (note.duration / 2) + "},";
+		} else {
+			return "{" + Math.round(note.hertz) + "," + note.duration + "},";
+		}
 	}
 	
 	notes.forEach(function(note) {
