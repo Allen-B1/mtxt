@@ -107,6 +107,11 @@ namespace M {
 		}
 	}
 
+	/* TODO: Change from
+	 *	4C4-4E4
+	 * to
+	 *	4C4E4
+	 */
 	export class Chord {
 		notes: Note[] = [];
 		constructor(input: string) {

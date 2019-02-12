@@ -94,6 +94,11 @@ var M;
         }
     }
     M.Note = Note;
+    /* TODO: Change from
+     *	4C4-4E4
+     * to
+     *	4C4E4
+     */
     class Chord {
         constructor(input) {
             this.notes = [];
